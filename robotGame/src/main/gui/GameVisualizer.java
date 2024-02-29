@@ -1,8 +1,7 @@
 package gui;
 
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 
@@ -38,6 +37,8 @@ public class GameVisualizer extends JPanel {
      * Метод для отрисовки и обновления игрового поля
      */
     public GameVisualizer() {
+        requestFocusInWindow();
+
         m_timer.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -50,6 +51,8 @@ public class GameVisualizer extends JPanel {
                 onModelUpdateEvent();
             }
         }, 0, 10);
+
+
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -66,6 +69,30 @@ public class GameVisualizer extends JPanel {
                 repaint();
             }
         });
+
+        addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                switch (e.getKeyCode()) {
+                    case KeyEvent.VK_W:
+                        setTargetPosition(new Point((int) (m_targetPositionX), (int)m_targetPositionY - 1));
+                        repaint();
+                        break;
+                    case KeyEvent.VK_S:
+                        setTargetPosition(new Point((int) (m_targetPositionX), (int)m_targetPositionY + 1));
+                        repaint();
+                        break;
+                    case KeyEvent.VK_A:
+                        setTargetPosition(new Point((int)m_targetPositionX - 1, (int) m_targetPositionY));
+                        repaint();
+                        break;
+                    case KeyEvent.VK_D:
+                        setTargetPosition(new Point((int)m_targetPositionX + 100, (int) m_targetPositionY));
+                        repaint();
+                        break;
+                }
+            }
+        });
         setDoubleBuffered(true);
         try {
             InputStream inputStream = getClass().getClassLoader().
@@ -78,11 +105,12 @@ public class GameVisualizer extends JPanel {
 
 
     protected void setTargetPosition(Point p) {
-        m_targetPositionX = p.x;
-        m_targetPositionY = p.y;
+        m_targetPositionX = (int) applyLimits(p.x,2,backgroundImage.getWidth() - 50);
+        m_targetPositionY = (int) applyLimits(p.y,2,backgroundImage.getHeight() - 50);
     }
 
     protected void onRedrawEvent() {
+        requestFocusInWindow();
         EventQueue.invokeLater(this::repaint);
     }
 
