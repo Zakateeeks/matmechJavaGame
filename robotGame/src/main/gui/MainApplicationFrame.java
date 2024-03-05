@@ -2,6 +2,8 @@ package gui;
 
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 
 import javax.swing.*;
 
@@ -9,6 +11,7 @@ import log.Logger;
 
 public class MainApplicationFrame extends JFrame {
     private final JDesktopPane desktopPane = new JDesktopPane();
+    private int result;
 
     public MainApplicationFrame() {
         //Make the big window be indented 50 pixels from each edge
@@ -26,12 +29,50 @@ public class MainApplicationFrame extends JFrame {
 
         GameWindow gameWindow = new GameWindow();
         GameMenu gameMenu = new GameMenu();
+        CreateMenu confirmMenu = new CreateMenu();
 
         gameWindow.setSize(screenSize.width, screenSize.height);
         addWindow(gameWindow);
 
         setJMenuBar(gameMenu.generateMenuBar());
-        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+        addWindowListener(new WindowListener() {
+            @Override
+            public void windowOpened(WindowEvent e) {
+            }
+
+            @Override
+            public void windowClosing(WindowEvent e) {
+                result = confirmMenu.createClosedMenu();
+                System.out.println(result);
+                if (result == 1) {
+                    e.getWindow().setVisible(false);
+                    System.exit(0);
+                }
+            }
+
+            @Override
+            public void windowClosed(WindowEvent e) {
+            }
+
+            @Override
+            public void windowIconified(WindowEvent e) {
+            }
+
+            @Override
+            public void windowDeiconified(WindowEvent e) {
+            }
+
+            @Override
+            public void windowActivated(WindowEvent e) {
+            }
+
+            @Override
+            public void windowDeactivated(WindowEvent e) {
+            }
+        });
+
+
     }
 
     protected LogWindow createLogWindow() {
