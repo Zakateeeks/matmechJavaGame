@@ -6,6 +6,7 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowEvent;
 
 /**
  * Класс, описывающий работу основного меню и его создание
@@ -75,6 +76,7 @@ public class GameMenu extends JFrame {
      * @return меню-бар ))) Тип: JMenuBar
      */
     protected JMenuBar generateMenuBar() {
+        CreateMenu confirmMenu = new CreateMenu();
         JMenuBar menuBar = new JMenuBar();
 
         JMenu lookAndFeelMenu = createJMenu("Режим отображения", "Управление режимом отображения приложения");
@@ -97,8 +99,18 @@ public class GameMenu extends JFrame {
             testMenu.add(addLogMessageItem);
         }
 
+        JMenu closeMenu = createJMenu("Выйти", "Выход из приложения");
+        closeMenu.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.out.println("Пока не работает");
+            }
+        });
+
         menuBar.add(lookAndFeelMenu);
         menuBar.add(testMenu);
+        menuBar.add(Box.createHorizontalGlue());
+        menuBar.add(closeMenu);
 
         return menuBar;
     }

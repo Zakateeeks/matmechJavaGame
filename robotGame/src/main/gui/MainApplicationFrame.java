@@ -36,8 +36,6 @@ public class MainApplicationFrame extends JFrame {
 
         setJMenuBar(gameMenu.generateMenuBar());
         setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-
-        //gameMenu.createMenuBar();
         addWindowListener(new WindowListener() {
             @Override
             public void windowOpened(WindowEvent e) {
@@ -45,7 +43,7 @@ public class MainApplicationFrame extends JFrame {
 
             @Override
             public void windowClosing(WindowEvent e) {
-                confirmMenu.createClosedMenu();
+                confirmMenu.createClosedMenu(e);
             }
 
             @Override
