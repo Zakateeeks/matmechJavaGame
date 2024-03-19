@@ -8,7 +8,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 
 /**
- * Класс, описывающий работу меню и его создание
+ * Класс, описывающий работу основного меню и его создание
  */
 public class GameMenu extends JFrame {
 
@@ -23,6 +23,11 @@ public class GameMenu extends JFrame {
         return menuItem;
     }
 
+    /**
+     * Какая-то нерабочая фигня. Вывело кучу ошибок
+     *
+     * @return переменную типа JMenuBar
+     */
     protected JMenuBar createMenuBar() {
         JMenuBar menuBar = new JMenuBar();
 
@@ -55,7 +60,7 @@ public class GameMenu extends JFrame {
         return jmenu;
     }
 
-    protected void addJMenuItem(JMenu jmenu, String text ){
+    protected void addJMenuItem(JMenu jmenu, String text) {
         JMenuItem item = new JMenuItem(text, KeyEvent.VK_S);
         item.addActionListener((event) -> {
             setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -64,7 +69,11 @@ public class GameMenu extends JFrame {
         jmenu.add(item);
     }
 
-    // Тоже надо объединить в метод и сделать читабельно
+    /**
+     * Создает основной меню-бар
+     *
+     * @return меню-бар ))) Тип: JMenuBar
+     */
     protected JMenuBar generateMenuBar() {
         JMenuBar menuBar = new JMenuBar();
 
@@ -75,7 +84,7 @@ public class GameMenu extends JFrame {
         }
 
         {
-            addJMenuItem(lookAndFeelMenu,"Универсальная схема");
+            addJMenuItem(lookAndFeelMenu, "Универсальная схема");
         }
 
         JMenu testMenu = createJMenu("Teсты", "Тестовые команды");
@@ -90,6 +99,7 @@ public class GameMenu extends JFrame {
 
         menuBar.add(lookAndFeelMenu);
         menuBar.add(testMenu);
+
         return menuBar;
     }
 
