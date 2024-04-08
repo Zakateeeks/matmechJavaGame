@@ -99,18 +99,25 @@ public class GameMenu extends JFrame {
             testMenu.add(addLogMessageItem);
         }
 
-        JMenu closeMenu = createJMenu("Выйти", "Выход из приложения");
-        closeMenu.addActionListener(new ActionListener() {
+        JButton exitButton = new JButton("Выход");
+        exitButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                System.out.println("Пока не работает");
+                Object[] options = {"Да", "Нет"};
+                int response = JOptionPane.showOptionDialog(null, "Вы действительно хотите выйти?",
+                        "Подтверждение выхода", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
+                        null, options, options[1]);
+                if (response == JOptionPane.YES_OPTION) {
+                    System.exit(0);
+                }
             }
         });
+
 
         menuBar.add(lookAndFeelMenu);
         menuBar.add(testMenu);
         menuBar.add(Box.createHorizontalGlue());
-        menuBar.add(closeMenu);
+        menuBar.add(exitButton);
 
         return menuBar;
     }

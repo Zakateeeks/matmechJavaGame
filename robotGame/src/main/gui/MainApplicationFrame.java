@@ -2,10 +2,12 @@ package gui;
 
 import java.awt.Dimension;
 import java.awt.Toolkit;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
+import java.awt.event.*;
 
 import javax.swing.*;
+import javax.swing.event.InternalFrameAdapter;
+import javax.swing.event.InternalFrameEvent;
+
 
 import log.Logger;
 
@@ -26,6 +28,18 @@ public class MainApplicationFrame extends JFrame {
 
         LogWindow logWindow = createLogWindow();
         addWindow(logWindow);
+        logWindow.setDefaultCloseOperation(JInternalFrame.DO_NOTHING_ON_CLOSE);
+        logWindow.addInternalFrameListener(new InternalFrameAdapter() {
+            @Override
+            public void internalFrameClosing(InternalFrameEvent e) {
+                int option = JOptionPane.showConfirmDialog(logWindow, "Вы действительно хотите закрыть окно лога?",
+                        "Подтверждение закрытия", JOptionPane.YES_NO_OPTION);
+                if (option == JOptionPane.YES_OPTION) {
+                    logWindow.dispose();
+                }
+            }
+        });
+
 
         GameWindow gameWindow = new GameWindow();
         GameMenu gameMenu = new GameMenu();
@@ -33,6 +47,17 @@ public class MainApplicationFrame extends JFrame {
 
         gameWindow.setSize(screenSize.width, screenSize.height);
         addWindow(gameWindow);
+        gameWindow.setDefaultCloseOperation(JInternalFrame.DO_NOTHING_ON_CLOSE);
+        gameWindow.addInternalFrameListener(new InternalFrameAdapter() {
+            @Override
+            public void internalFrameClosing(InternalFrameEvent e) {
+                int option = JOptionPane.showConfirmDialog(gameWindow, "Вы действительно хотите закрыть окно Игры?",
+                        "Подтверждение закрытия", JOptionPane.YES_NO_OPTION);
+                if (option == JOptionPane.YES_OPTION) {
+                    gameWindow.dispose();
+                }
+            }
+        });
 
         setJMenuBar(gameMenu.generateMenuBar());
         setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
@@ -44,6 +69,7 @@ public class MainApplicationFrame extends JFrame {
             @Override
             public void windowClosing(WindowEvent e) {
                 confirmMenu.createClosedMenu(e);
+
             }
 
             @Override
