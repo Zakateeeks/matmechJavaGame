@@ -28,6 +28,9 @@ public class LogWindowSource {
 
     public void registerListener(LogChangeListener listener) {
         synchronized (m_listeners) {
+            if (!m_listeners.isEmpty()){
+                m_listeners.clear();
+            }
             m_listeners.add(listener);
             updateActiveListeners();
 
