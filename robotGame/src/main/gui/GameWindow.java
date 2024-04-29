@@ -5,7 +5,7 @@ import java.awt.BorderLayout;
 import javax.swing.JInternalFrame;
 import javax.swing.JPanel;
 
-public class GameWindow extends JInternalFrame {
+public class GameWindow extends AbstractWindow {
     private final GameVisualizer m_visualizer;
 
     public GameWindow() {
@@ -17,4 +17,7 @@ public class GameWindow extends JInternalFrame {
         pack();
         setSize(panel.getSize());
     }
+
+    @Override
+    protected void closeWindow() {}
 }

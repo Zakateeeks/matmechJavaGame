@@ -11,7 +11,7 @@ import log.LogChangeListener;
 import log.LogEntry;
 import log.LogWindowSource;
 
-public class LogWindow extends JInternalFrame implements LogChangeListener {
+public class LogWindow extends AbstractWindow implements LogChangeListener {
     private LogWindowSource m_logSource;
     private TextArea m_logContent;
 
@@ -41,5 +41,10 @@ public class LogWindow extends JInternalFrame implements LogChangeListener {
     @Override
     public void onLogChanged() {
         EventQueue.invokeLater(this::updateLogContent);
+    }
+
+    @Override
+    protected void closeWindow() {
+       m_logSource.unregisterListener(this);
     }
 }
