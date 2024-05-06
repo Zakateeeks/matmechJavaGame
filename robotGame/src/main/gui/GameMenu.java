@@ -6,12 +6,19 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 
 /**
  * Класс, описывающий работу основного меню и его создание
  */
 public class GameMenu extends JFrame {
+    private ResourceBundle messages;
+    public GameMenu() {
+        messages = ResourceBundle.getBundle("locale.messages", Locale.getDefault());
+    }
+
 
     protected JMenuItem createMenuItem(String text, int mnemonic, int acceleratorKey,
                                        String actionCommand, ActionListener actionListener) {
@@ -33,18 +40,18 @@ public class GameMenu extends JFrame {
         JMenuBar menuBar = new JMenuBar();
 
         //Set up the lone menu.
-        JMenu menu = new JMenu("Document");
+        JMenu menu = new JMenu(messages.getString("menu.document"));
         menu.setMnemonic(KeyEvent.VK_D);
         menuBar.add(menu);
 
         //Set up the first menu item.
-        JMenuItem menuItem = createMenuItem("New", KeyEvent.VK_N, KeyEvent.VK_N,
+        JMenuItem menuItem = createMenuItem(messages.getString("menu.new"), KeyEvent.VK_N, KeyEvent.VK_N,
                 "new", (event) -> {
                 });
         menu.add(menuItem);
 
         //Set up the second menu item.
-        menuItem = createMenuItem("Quit", KeyEvent.VK_Q, KeyEvent.VK_Q,
+        menuItem = createMenuItem(messages.getString("menu.quit"), KeyEvent.VK_Q, KeyEvent.VK_Q,
                 "quit", (event) -> {
                 });
         menu.add(menuItem);
@@ -76,36 +83,53 @@ public class GameMenu extends JFrame {
      * @return меню-бар ))) Тип: JMenuBar
      */
     protected JMenuBar generateMenuBar() {
-        CreateMenu confirmMenu = new CreateMenu();
+
         JMenuBar menuBar = new JMenuBar();
+        JMenu languageMenu = new JMenu(messages.getString("menu.language"));
+        // Добавляем подменю для каждого доступного языка
+        JMenuItem russianMenuItem = new JMenuItem(messages.getString("menu.russian"));
+        russianMenuItem.addActionListener((event) -> {
+            changeLocale(new Locale("ru", "ru"));
+        });
+        languageMenu.add(russianMenuItem);
 
-        JMenu lookAndFeelMenu = createJMenu("Режим отображения", "Управление режимом отображения приложения");
+        JMenuItem englishMenuItem = new JMenuItem(messages.getString("menu.english"));
+        englishMenuItem.addActionListener((event) -> {
+            changeLocale(new Locale("en","en"));
+        });
+        languageMenu.add(englishMenuItem);
+
+        menuBar.add(languageMenu);
+
+        JMenu lookAndFeelMenu = createJMenu(messages.getString("menu.viewMode"), messages.getString("menu.viewModeDescription"));
 
         {
-            addJMenuItem(lookAndFeelMenu, "Системная схема");
+            addJMenuItem(lookAndFeelMenu, messages.getString("menu.systemScheme"));
         }
 
         {
-            addJMenuItem(lookAndFeelMenu, "Универсальная схема");
+            addJMenuItem(lookAndFeelMenu, messages.getString("menu.universalScheme"));
         }
 
-        JMenu testMenu = createJMenu("Teсты", "Тестовые команды");
+        JMenu testMenu = createJMenu(messages.getString("menu.tests"), messages.getString("menu.testCommand"));
 
         {
-            JMenuItem addLogMessageItem = new JMenuItem("Сообщение в лог", KeyEvent.VK_S);
+            JMenuItem addLogMessageItem = new JMenuItem(messages.getString("menu.logMessage"), KeyEvent.VK_S);
             addLogMessageItem.addActionListener((event) -> {
-                Logger.debug("Новая строка");
+                Logger.debug(messages.getString("menu.logNewString"));
             });
             testMenu.add(addLogMessageItem);
         }
 
-        JButton exitButton = new JButton("Выход");
+        JButton exitButton = new JButton(messages.getString("menu.quit"));
         exitButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                Object[] options = {"Да", "Нет"};
-                int response = JOptionPane.showOptionDialog(null, "Вы действительно хотите выйти?",
-                        "Подтверждение выхода", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
+                messages = ResourceBundle.getBundle("locale.messages", Locale.getDefault());
+
+                Object[] options = {messages.getString("yes.option"), messages.getString("no.option")};
+                int response = JOptionPane.showOptionDialog(null, messages.getString("confirmation.dialog.message"),
+                        messages.getString("confirmation.dialog.title"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
                         null, options, options[1]);
                 if (response == JOptionPane.YES_OPTION) {
                     System.exit(0);
@@ -120,6 +144,10 @@ public class GameMenu extends JFrame {
         menuBar.add(exitButton);
 
         return menuBar;
+    }
+
+    private void changeLocale(Locale locale) {
+        messages = ResourceBundle.getBundle("locale.messages", locale);
     }
 
     private void setLookAndFeel(String className) {
