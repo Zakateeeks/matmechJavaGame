@@ -32,6 +32,7 @@ public class GameVisualizer extends JPanel {
      * Метод для отрисовки и обновления игрового поля
      */
     public GameVisualizer() {
+        playerRobot.player = true;
         roboList.add(playerRobot);
 
         roboList.add(new PhisicsRobot());
@@ -69,13 +70,6 @@ public class GameVisualizer extends JPanel {
 
                 playerRobot.setTargetPosition(imagePoint);
 
-
-                Iterator<PhisicsRobot> roboIter = roboList.iterator();
-                while (roboIter.hasNext()) {
-                    PhisicsRobot robot = roboIter.next();
-                    robot.randomActivies();
-                }
-
                 repaint();
             }
         });
@@ -85,19 +79,19 @@ public class GameVisualizer extends JPanel {
             public void keyPressed(KeyEvent e) {
                 switch (e.getKeyCode()) {
                     case KeyEvent.VK_W:
-                        playerRobot.changeTargetPosition("y",-1);
+                        playerRobot.changeTargetPosition("y", -1);
                         repaint();
                         break;
                     case KeyEvent.VK_S:
-                        playerRobot.changeTargetPosition("y",1);
+                        playerRobot.changeTargetPosition("y", 1);
                         repaint();
                         break;
                     case KeyEvent.VK_A:
-                        playerRobot.changeTargetPosition("x",-1);
+                        playerRobot.changeTargetPosition("x", -1);
                         repaint();
                         break;
                     case KeyEvent.VK_D:
-                        playerRobot.changeTargetPosition("x",1);
+                        playerRobot.changeTargetPosition("x", 1);
                         repaint();
                         break;
                 }
@@ -119,6 +113,14 @@ public class GameVisualizer extends JPanel {
             PhisicsRobot robot = roboIter.next();
             robot.moveRobot(5);
         }
+
+        Iterator<PhisicsRobot> roboIter2 = roboList.iterator();
+        int posX = (int) playerRobot.m_robotPositionX;
+        int posY = (int) playerRobot.m_robotPositionY;
+        while (roboIter2.hasNext()) {
+            PhisicsRobot robot = roboIter2.next();
+            robot.chaseActivies(posX, posY);
+        }
     }
 
     protected void onRedrawEvent() {
@@ -138,7 +140,7 @@ public class GameVisualizer extends JPanel {
         while (roboIter.hasNext()) {
             PhisicsRobot robot = roboIter.next();
             drawRobot(g2d, round(robot.m_robotPositionX), round(robot.m_robotPositionY), robot.m_robotDirection);
-            drawTarget(g2d, robot.m_targetPositionX, robot.m_targetPositionY);
+            //drawTarget(g2d, playerRobot.m_targetPositionX, playerRobot.m_targetPositionY);
         }
     }
 
@@ -181,6 +183,7 @@ public class GameVisualizer extends JPanel {
         g.setColor(Color.GREEN);
         drawOval(g, x, y, 5, 5);
     }
+
     private static int round(double value) {
         return (int) (value + 0.5);
     }

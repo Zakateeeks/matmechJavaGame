@@ -7,7 +7,7 @@ import java.util.Random;
 
 import static java.awt.geom.Point2D.distance;
 
-public class PhisicsRobot{
+public class PhisicsRobot {
 
     protected volatile double m_robotPositionX = 100;
     protected volatile double m_robotPositionY = 100;
@@ -18,6 +18,8 @@ public class PhisicsRobot{
 
     private static final double maxVelocity = 0.1;
     private static final double maxAngularVelocity = 0.008;
+
+    boolean player = false;
 
 
     private static double distance(double x1, double y1, double x2, double y2) {
@@ -111,12 +113,14 @@ public class PhisicsRobot{
     }
 
 
-    protected void randomActivies(){
-        Random random = new Random();
-        int randomX = random.nextInt(1000);
-        int randomY =  random.nextInt(1000);
-        Point p = new Point(randomX,randomY);
-        setTargetPosition(p);
+    protected void chaseActivies(int posX, int posY) {
+        if (!player) {
+            Random random = new Random();
+            int randomX = random.nextInt(200) + (posX - 100);
+            int randomY = random.nextInt(200) + (posY - 100);
+            Point p = new Point(randomX, randomY);
+            setTargetPosition(p);
+        }
 
     }
 
