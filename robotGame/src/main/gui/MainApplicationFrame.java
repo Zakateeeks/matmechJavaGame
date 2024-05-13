@@ -12,6 +12,8 @@ public class MainApplicationFrame extends JFrame {
     private final JDesktopPane desktopPane = new JDesktopPane();
     private int result;
 
+    public GameMenu gameMenu;
+
     public MainApplicationFrame() {
         //Make the big window be indented 50 pixels from each edge
         //of the screen.
@@ -28,7 +30,7 @@ public class MainApplicationFrame extends JFrame {
 
 
         GameWindow gameWindow = new GameWindow();
-        GameMenu gameMenu = new GameMenu();
+        gameMenu = new GameMenu(this);
         CreateMenu confirmMenu = new CreateMenu();
 
         gameWindow.setSize(screenSize.width, screenSize.height);
@@ -84,6 +86,21 @@ public class MainApplicationFrame extends JFrame {
     protected void addWindow(JInternalFrame frame) {
         desktopPane.add(frame);
         frame.setVisible(true);
+    }
+
+    public void updateDesktopPane() {
+        for (JInternalFrame frame : desktopPane.getAllFrames()) {
+            if (frame instanceof AbstractWindow) {
+                ((AbstractWindow) frame).updateLabels();
+            }
+        }
+        updateMainFrame();
+    }
+
+    public void updateMainFrame() {
+        setJMenuBar(gameMenu.generateMenuBar());
+        desktopPane.revalidate();
+        desktopPane.repaint();
     }
 
 }

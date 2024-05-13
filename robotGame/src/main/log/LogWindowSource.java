@@ -32,9 +32,7 @@ public class LogWindowSource {
         synchronized (m_listeners) {
             m_listeners.add(listener);
             updateActiveListeners();
-
         }
-
     }
 
     public void unregisterListener(LogChangeListener listener) {

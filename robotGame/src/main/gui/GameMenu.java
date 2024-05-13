@@ -14,9 +14,10 @@ import java.util.ResourceBundle;
  * Класс, описывающий работу основного меню и его создание
  */
 public class GameMenu extends JFrame {
-    private ResourceBundle messages;
-    public GameMenu() {
-        messages = ResourceBundle.getBundle("locale.messages", Locale.getDefault());
+    private ResourceBundle messages = new LocaleMessages().messages;
+    private MainApplicationFrame parentPanel;
+    public GameMenu(MainApplicationFrame panel) {
+        parentPanel = panel;
     }
 
 
@@ -86,7 +87,6 @@ public class GameMenu extends JFrame {
 
         JMenuBar menuBar = new JMenuBar();
         JMenu languageMenu = new JMenu(messages.getString("menu.language"));
-        // Добавляем подменю для каждого доступного языка
         JMenuItem russianMenuItem = new JMenuItem(messages.getString("menu.russian"));
         russianMenuItem.addActionListener((event) -> {
             changeLocale(new Locale("ru", "ru"));
@@ -125,7 +125,6 @@ public class GameMenu extends JFrame {
         exitButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                messages = ResourceBundle.getBundle("locale.messages", Locale.getDefault());
 
                 Object[] options = {messages.getString("yes.option"), messages.getString("no.option")};
                 int response = JOptionPane.showOptionDialog(null, messages.getString("confirmation.dialog.message"),
@@ -147,7 +146,11 @@ public class GameMenu extends JFrame {
     }
 
     private void changeLocale(Locale locale) {
-        messages = ResourceBundle.getBundle("locale.messages", locale);
+        LocaleMessages msg = new LocaleMessages();
+        msg.changeLocale(locale);
+        messages = msg.getMessages();
+
+       parentPanel.updateDesktopPane();
     }
 
     private void setLookAndFeel(String className) {

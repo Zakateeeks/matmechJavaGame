@@ -33,6 +33,8 @@ public class GameVisualizer extends JPanel {
      */
     public GameVisualizer() {
         playerRobot.player = true;
+        playerRobot.maxVelocity = 0.5;
+        playerRobot.maxAngularVelocity = 0.015;
         roboList.add(playerRobot);
 
         roboList.add(new PhisicsRobot());
@@ -80,19 +82,15 @@ public class GameVisualizer extends JPanel {
                 switch (e.getKeyCode()) {
                     case KeyEvent.VK_W:
                         playerRobot.changeTargetPosition("y", -1);
-                        repaint();
                         break;
                     case KeyEvent.VK_S:
                         playerRobot.changeTargetPosition("y", 1);
-                        repaint();
                         break;
                     case KeyEvent.VK_A:
                         playerRobot.changeTargetPosition("x", -1);
-                        repaint();
                         break;
                     case KeyEvent.VK_D:
                         playerRobot.changeTargetPosition("x", 1);
-                        repaint();
                         break;
                 }
             }
@@ -121,6 +119,8 @@ public class GameVisualizer extends JPanel {
             PhisicsRobot robot = roboIter2.next();
             robot.chaseActivies(posX, posY);
         }
+
+        repaint();
     }
 
     protected void onRedrawEvent() {
@@ -140,8 +140,9 @@ public class GameVisualizer extends JPanel {
         while (roboIter.hasNext()) {
             PhisicsRobot robot = roboIter.next();
             drawRobot(g2d, round(robot.m_robotPositionX), round(robot.m_robotPositionY), robot.m_robotDirection);
-            //drawTarget(g2d, playerRobot.m_targetPositionX, playerRobot.m_targetPositionY);
+            drawTarget(g2d, robot.m_targetPositionX, robot.m_targetPositionY);
         }
+
     }
 
 

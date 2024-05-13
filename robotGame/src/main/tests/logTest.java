@@ -14,53 +14,47 @@ public class logTest {
 
     @Before
     public void setUp() {
-        logWindowSource = new LogWindowSource(5); // Создаем объект с ограничением на 5 сообщений
+        logWindowSource = new LogWindowSource(5);
     }
 
     @After
     public void tearDown() {
-        logWindowSource = null; // Очищаем ссылку на объект после каждого теста
+        logWindowSource = null;
     }
 
     @Test
     public void testMemoryLeak_registerListener() {
-        for (int i = 0; i < 100000; i++) { // Добавляем множество слушателей, но не удаляем их
+        for (int i = 0; i < 100000; i++) {
             logWindowSource.registerListener(new LogChangeListener() {
                 @Override
                 public void onLogChanged() {
-                    // Пустая реализация метода
                 }
             });
         }
-        // На этом этапе ожидаем утечку памяти, так как слушатели не были удалены
     }
 
     @Test
     public void testMemoryLeak_append() {
-        for (int i = 0; i < 100000; i++) { // Добавляем множество сообщений, чтобы превысить ограничение
+        for (int i = 0; i < 100000; i++) {
             logWindowSource.append(LogLevel.Info, "Test message");
         }
-        // На этом этапе ожидаем утечку памяти, так как сообщения не были удалены и превысили ограничение
     }
 
     @Test
     public void testMemoryLeak_unregisterListener() {
-        for (int i = 0; i < 100000; i++) { // Добавляем множество слушателей
+        for (int i = 0; i < 100000; i++) {
             LogChangeListener listener = new LogChangeListener() {
                 @Override
                 public void onLogChanged() {
-                    // Пустая реализация метода
                 }
             };
             logWindowSource.registerListener(listener);
-            logWindowSource.unregisterListener(listener); // Не удаляем слушателей после использования
+            logWindowSource.unregisterListener(listener);
         }
-        // На этом этапе ожидаем утечку памяти, так как слушатели не были удалены после использования
     }
 
     @Test
     public void testNoMemoryLeak() {
-        // Простой тест для проверки отсутствия утечек памяти
-        assertEquals(0, 0); // Просто проверяем равенство нулю, чтобы тест считался успешным
+        assertEquals(0, 0);
     }
 }

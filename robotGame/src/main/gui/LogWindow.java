@@ -3,6 +3,7 @@ package gui;
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.awt.TextArea;
+import java.util.Locale;
 import java.util.ResourceBundle;
 
 import javax.swing.JInternalFrame;
@@ -14,8 +15,8 @@ import log.LogWindowSource;
 
 public class LogWindow extends AbstractWindow implements LogChangeListener {
     private LogWindowSource m_logSource;
-    private ResourceBundle messages;
     private TextArea m_logContent;
+    private ResourceBundle messages =LocaleMessages.messages;
 
     public LogWindow(LogWindowSource logSource) {
         super("Протокол работы", true, true, true, true);
@@ -48,5 +49,13 @@ public class LogWindow extends AbstractWindow implements LogChangeListener {
     @Override
     protected void closeWindow() {
        m_logSource.unregisterListener(this);
+    }
+
+
+    @Override
+    public void updateLabels(){
+        messages = new LocaleMessages().getMessages();
+        this.setTitle(messages.getString("title.logWindow"));
+        super.updateLabels();
     }
 }

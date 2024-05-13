@@ -10,15 +10,34 @@ import javax.swing.event.InternalFrameEvent;
 public abstract class AbstractWindow extends JInternalFrame {
 
     private ResourceBundle messages;
+    private InternalFrameAdapter adapter = null;
 
     public AbstractWindow(String title, boolean resizable, boolean closable, boolean maximizable, boolean iconifiable) {
         super(title, resizable, closable, maximizable, iconifiable);
+        getCloseWindow();
+    }
+
+    protected abstract void closeWindow();
+
+    @Override
+    public void dispose() {
+        closeWindow();
+        super.dispose();
+    }
+
+    public void updateLabels(){
+        getCloseWindow();
+    };
+
+    public void getCloseWindow(){
+        if (adapter != null){
+            removeInternalFrameListener(adapter);
+        }
+
         setDefaultCloseOperation(JInternalFrame.DO_NOTHING_ON_CLOSE);
-
-        messages = ResourceBundle.getBundle("locale.messages", Locale.getDefault());
-
+        messages = new LocaleMessages().getMessages();
         Object[] options = {messages.getString("yes.option"), messages.getString("no.option")};
-        addInternalFrameListener(new InternalFrameAdapter() {
+        addInternalFrameListener(adapter = new InternalFrameAdapter() {
             @Override
             public void internalFrameClosing(InternalFrameEvent e) {
                 int result = JOptionPane.showOptionDialog(
@@ -32,13 +51,5 @@ public abstract class AbstractWindow extends JInternalFrame {
                 }
             }
         });
-    }
-
-    protected abstract void closeWindow();
-
-    @Override
-    public void dispose() {
-        closeWindow();
-        super.dispose();
     }
 }

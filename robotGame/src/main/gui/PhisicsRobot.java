@@ -16,8 +16,8 @@ public class PhisicsRobot {
     protected volatile int m_targetPositionX = 150;
     protected volatile int m_targetPositionY = 100;
 
-    private static final double maxVelocity = 0.1;
-    private static final double maxAngularVelocity = 0.008;
+    double maxVelocity = 0.1;
+    double maxAngularVelocity = 0.008;
 
     boolean player = false;
 
