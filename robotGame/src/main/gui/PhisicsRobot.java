@@ -9,30 +9,35 @@ import static java.awt.geom.Point2D.distance;
 
 public class PhisicsRobot {
 
-    protected volatile double m_robotPositionX = 100;
-    protected volatile double m_robotPositionY = 100;
+    protected volatile double m_robotPositionX;
+    protected volatile double m_robotPositionY;
     protected volatile double m_robotDirection = 5;
 
-    protected volatile int m_targetPositionX = 150;
-    protected volatile int m_targetPositionY = 100;
+    protected volatile int m_targetPositionX;
+    protected volatile int m_targetPositionY;
+    private boolean fear = false;
 
-    double maxVelocity = 0.1;
-    double maxAngularVelocity = 0.008;
+    public double maxVelocity = 1;
+    public boolean player = false;
+    public int m_level = 1;
 
-    boolean player = false;
+    public PhisicsRobot(int level) {
+        m_level = level;
+        maxVelocity /= ((double) m_level / 2);
+
+        Random random = new Random();
+        m_robotPositionX = random.nextInt(1500);
+        m_robotPositionY = random.nextInt(900);
+
+        m_targetPositionX = (int) m_robotPositionX;
+        m_targetPositionY = (int) m_robotPositionY;
+    }
 
 
     private static double distance(double x1, double y1, double x2, double y2) {
         double diffX = x1 - x2;
         double diffY = y1 - y2;
         return Math.sqrt(diffX * diffX + diffY * diffY);
-    }
-
-    private static double angleTo(double fromX, double fromY, double toX, double toY) {
-        double diffX = toX - fromX;
-        double diffY = toY - fromY;
-
-        return asNormalizedRadians(Math.atan2(diffY, diffX));
     }
 
     private static double applyLimits(double value, double min, double max) {
@@ -47,54 +52,31 @@ public class PhisicsRobot {
      * Метод, задающий движение роботу
      */
     void moveRobot(double duration) {
-
         double distance = distance(m_targetPositionX, m_targetPositionY,
                 m_robotPositionX, m_robotPositionY);
-        if (distance < 0.5) {
+        if (distance < 5) {
+            if (!player) {
+                generatePosition();
+            }
             return;
         }
-        double velocity = maxVelocity;
-        double angleToTarget = angleTo(m_robotPositionX, m_robotPositionY, m_targetPositionX, m_targetPositionY);
-        double angularVelocity = 0;
-        if (angleToTarget > m_robotDirection) {
-            angularVelocity = maxAngularVelocity;
-        }
-        if (angleToTarget < m_robotDirection) {
-            angularVelocity = -maxAngularVelocity;
+        double newX;
+        double newY;
+        if (m_robotPositionX < m_targetPositionX) {
+            newX = m_robotPositionX + maxVelocity;
+        } else {
+            newX = m_robotPositionX - maxVelocity;
         }
 
-
-        velocity = applyLimits(velocity, 0, maxVelocity);
-        angularVelocity = applyLimits(angularVelocity, -maxAngularVelocity, maxAngularVelocity);
-        double newX = m_robotPositionX + velocity / angularVelocity *
-                (Math.sin(m_robotDirection + angularVelocity * duration) -
-                        Math.sin(m_robotDirection));
-        if (!Double.isFinite(newX)) {
-            newX = m_robotPositionX + velocity * duration * Math.cos(m_robotDirection);
+        if (m_robotPositionY < m_targetPositionY) {
+            newY = m_robotPositionY + maxVelocity;
+        } else {
+            newY = m_robotPositionY - maxVelocity;
         }
-        double newY = m_robotPositionY - velocity / angularVelocity *
-                (Math.cos(m_robotDirection + angularVelocity * duration) -
-                        Math.cos(m_robotDirection));
-        if (!Double.isFinite(newY)) {
-            newY = m_robotPositionY + velocity * duration * Math.sin(m_robotDirection);
-        }
-
         newX = applyLimits(newX, 0, 1920);
         newY = applyLimits(newY, 0, 1080);
         m_robotPositionX = newX;
         m_robotPositionY = newY;
-        double newDirection = asNormalizedRadians(m_robotDirection + angularVelocity * duration);
-        m_robotDirection = newDirection;
-    }
-
-    private static double asNormalizedRadians(double angle) {
-        while (angle < 0) {
-            angle += 2 * Math.PI;
-        }
-        while (angle >= 2 * Math.PI) {
-            angle -= 2 * Math.PI;
-        }
-        return angle;
     }
 
 
@@ -105,23 +87,49 @@ public class PhisicsRobot {
 
     protected void changeTargetPosition(String axis, int change) {
         if (axis.equals("x")) {
-            m_targetPositionX += change;
+            m_targetPositionX += change * (int) maxVelocity * 2;
         }
         if (axis.equals("y")) {
-            m_targetPositionY += change;
+            m_targetPositionY += change * (int) maxVelocity * 2;
         }
     }
 
 
     protected void chaseActivies(int posX, int posY) {
         if (!player) {
-            Random random = new Random();
-            int randomX = random.nextInt(200) + (posX - 100);
-            int randomY = random.nextInt(200) + (posY - 100);
-            Point p = new Point(randomX, randomY);
+            Point p = new Point(posX, posY);
             setTargetPosition(p);
         }
 
+    }
+
+    protected void escapeActivies(int posX, int posY) {
+        if (!player) {
+            if (distance(posX, posY, m_robotPositionX, m_robotPositionY) < 100 && !fear) {
+                fear = true;
+                maxVelocity *= 3;
+            } else if (fear) {
+                fear = false;
+                maxVelocity /= 3;
+            }
+        }
+
+    }
+
+    protected void generatePosition() {
+        Random random = new Random();
+        Point p = new Point(random.nextInt(1500), random.nextInt(900));
+        setTargetPosition(p);
+    }
+
+    protected boolean checkLose(int posX, int posY) {
+        double distance = distance(posX, posY,
+                m_robotPositionX, m_robotPositionY);
+        if (distance < 5) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
 

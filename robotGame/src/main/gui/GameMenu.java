@@ -99,6 +99,12 @@ public class GameMenu extends JFrame {
         });
         languageMenu.add(englishMenuItem);
 
+        JMenuItem spanishMenuItem = new JMenuItem(messages.getString("menu.spanish"));
+        spanishMenuItem.addActionListener((event) -> {
+            changeLocale(new Locale("es", "es"));
+        });
+        languageMenu.add(spanishMenuItem);
+
         menuBar.add(languageMenu);
 
         JMenu lookAndFeelMenu = createJMenu(messages.getString("menu.viewMode"), messages.getString("menu.viewModeDescription"));

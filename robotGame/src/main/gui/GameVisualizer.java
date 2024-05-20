@@ -12,14 +12,16 @@ import java.util.Timer;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
-
-import static java.lang.Math.round;
+import javax.swing.border.EmptyBorder;
 
 public class GameVisualizer extends JPanel {
 
-    private PhisicsRobot playerRobot = new PhisicsRobot();
+    private PhisicsRobot playerRobot = new PhisicsRobot(2);
     private ArrayList<PhisicsRobot> roboList = new ArrayList<PhisicsRobot>();
+    
     private final Timer m_timer = initTimer();
+    private ResourceBundle messages;
+
 
     private static Timer initTimer() {
         Timer timer = new Timer("events generator", true);
@@ -27,20 +29,30 @@ public class GameVisualizer extends JPanel {
     }
 
     private BufferedImage backgroundImage;
+    private Image targetFood;
+
+    private Image goodMicrob;
+    private Image badMicrob;
+    private Image playerMicrob;
+
 
     /**
      * Метод для отрисовки и обновления игрового поля
      */
     public GameVisualizer() {
+        getSprites();
+
         playerRobot.player = true;
-        playerRobot.maxVelocity = 0.5;
-        playerRobot.maxAngularVelocity = 0.015;
+        playerRobot.maxVelocity = 3;
         roboList.add(playerRobot);
 
-        roboList.add(new PhisicsRobot());
-        roboList.add(new PhisicsRobot());
-        roboList.add(new PhisicsRobot());
+        roboList.add(new PhisicsRobot(3));
+        roboList.add(new PhisicsRobot(3));
+        roboList.add(new PhisicsRobot(3));
 
+        roboList.add(new PhisicsRobot(1));
+        roboList.add(new PhisicsRobot(1));
+        roboList.add(new PhisicsRobot(1));
 
         requestFocusInWindow();
 
@@ -117,8 +129,31 @@ public class GameVisualizer extends JPanel {
         int posY = (int) playerRobot.m_robotPositionY;
         while (roboIter2.hasNext()) {
             PhisicsRobot robot = roboIter2.next();
-            robot.chaseActivies(posX, posY);
+            if (robot.m_level > playerRobot.m_level) {
+                boolean lose = robot.checkLose(posX, posY);
+                robot.chaseActivies(posX, posY);
+                if (lose) {
+                    JPanel panel = createConfirmLosePanel();
+
+                    // Custom button text
+                    String[] options = {messages.getString("loseOkMess")};
+                    int option = JOptionPane.showOptionDialog(null, panel, messages.getString("gameOver"),
+                            JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE,
+                            null, options, options[0]);
+
+                    if (option == JOptionPane.OK_OPTION) {
+                        // Close all windows
+                        Window[] windows = Window.getWindows();
+                        for (Window window : windows) {
+                            System.exit(0);
+                        }
+                    }
+                }
+            } else {
+                robot.escapeActivies(posX, posY);
+            }
         }
+
 
         repaint();
     }
@@ -139,38 +174,37 @@ public class GameVisualizer extends JPanel {
         Iterator<PhisicsRobot> roboIter = roboList.iterator();
         while (roboIter.hasNext()) {
             PhisicsRobot robot = roboIter.next();
-            drawRobot(g2d, round(robot.m_robotPositionX), round(robot.m_robotPositionY), robot.m_robotDirection);
-            drawTarget(g2d, robot.m_targetPositionX, robot.m_targetPositionY);
+            drawRobot(g2d, round(robot.m_robotPositionX), round(robot.m_robotPositionY), robot.m_robotDirection, robot.m_level);
+            if (robot.m_level < playerRobot.m_level) {
+                drawTarget(g2d, robot.m_targetPositionX, robot.m_targetPositionY);
+            }
         }
 
-    }
-
-
-    private static void fillOval(Graphics g, int centerX, int centerY, int diam1, int diam2) { //Отрисовка контура
-        g.fillOval(centerX - diam1 / 2, centerY - diam2 / 2, diam1, diam2);
-    }
-
-    private static void drawOval(Graphics g, int centerX, int centerY, int diam1, int diam2) { //Отрисовка розовой фигни
-        g.drawOval(centerX - diam1 / 2, centerY - diam2 / 2, diam1, diam2);
     }
 
     /**
      * Отрисовка робота
      * Сюда надо вставить картинку или gif
      */
-    private void drawRobot(Graphics2D g, int x, int y, double direction) {
+    private void drawRobot(Graphics2D g, int x, int y, double direction, int level) {
         int robotCenterX = round(x);
         int robotCenterY = round(y);
         AffineTransform t = AffineTransform.getRotateInstance(direction, robotCenterX, robotCenterY);
         g.setTransform(t);
-        g.setColor(Color.BLUE);
-        fillOval(g, robotCenterX, robotCenterY, 30, 10);
-        g.setColor(Color.BLACK);
-        drawOval(g, robotCenterX, robotCenterY, 30, 10);
-        g.setColor(Color.RED);
-        fillOval(g, robotCenterX + 10, robotCenterY, 10, 5);
-        g.setColor(Color.RED);
-        drawOval(g, robotCenterX + 10, robotCenterY, 5, 5);
+
+        Image thisDrow = null;
+        switch (level) {
+            case 1:
+                thisDrow = goodMicrob;
+                break;
+            case 2:
+                thisDrow = playerMicrob;
+                break;
+            case 3:
+                thisDrow = badMicrob;
+                break;
+        }
+        g.drawImage(thisDrow, robotCenterX, robotCenterY, null);
     }
 
     /**
@@ -179,13 +213,54 @@ public class GameVisualizer extends JPanel {
     private void drawTarget(Graphics2D g, int x, int y) {
         AffineTransform t = AffineTransform.getRotateInstance(0, 0, 0);
         g.setTransform(t);
-        g.setColor(Color.BLACK);
-        fillOval(g, x, y, 10, 10);
-        g.setColor(Color.GREEN);
-        drawOval(g, x, y, 5, 5);
+        g.drawImage(targetFood, x, y, null);
     }
 
     private static int round(double value) {
         return (int) (value + 0.5);
     }
+
+    private void getSprites() {
+        try {
+            InputStream inputStream1 = getClass().getClassLoader().
+                    getResourceAsStream("resources/me_microb.png");
+            playerMicrob = ImageIO.read(inputStream1);
+
+            InputStream inputStream2 = getClass().getClassLoader().
+                    getResourceAsStream("resources/bad_microb.png");
+            badMicrob = ImageIO.read(inputStream2);
+
+            InputStream inputStream3 = getClass().getClassLoader().
+                    getResourceAsStream("resources/peacefull_microb.png");
+            goodMicrob = ImageIO.read(inputStream3);
+
+            InputStream inputStream4 = getClass().getClassLoader().
+                    getResourceAsStream("resources/eda.png");
+            targetFood = ImageIO.read(inputStream4);
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public JPanel createConfirmLosePanel() {
+        messages = new LocaleMessages().getMessages();
+        JPanel panel = new JPanel();
+        panel.setLayout(new GridBagLayout());
+        panel.setBorder(new EmptyBorder(32, 32, 32, 32));
+
+        JLabel label = new JLabel(messages.getString("loseMessage"));
+        label.setFont(label.getFont().deriveFont(32f));
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.insets = new Insets(10, 10, 10, 10);
+        panel.add(label, gbc);
+
+        return panel;
+    }
+
 }

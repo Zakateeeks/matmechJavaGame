@@ -18,10 +18,10 @@ public class CreateMenu extends JFrame {
      *
      * @param e Событие окна, которое инициирует создание меню.
      */
-    private ResourceBundle messages = new LocaleMessages().getMessages();
+
 
     protected void createClosedMenu(WindowEvent e) {
-
+        ResourceBundle messages = new LocaleMessages().getMessages();
 
         Object[] options = {messages.getString("yes.option"), messages.getString("no.option")};
         int rc = JOptionPane.showOptionDialog(
